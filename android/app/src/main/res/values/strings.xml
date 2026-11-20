@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Calculadora</string>
+    <string name="history">Historial</string>
+    <string name="history_clear">Borrar todo</string>
+    <string name="history_empty">Aquí aparecerán tus cálculos.</string>
+    <string name="error_zero">No se puede dividir entre cero</string>
+    <string name="error_parentheses">Falta cerrar un paréntesis</string>
+    <string name="error_incomplete">Falta un número</string>
+    <string name="error_syntax">Operación no válida</string>
+    <string name="key_clear">Borrar todo</string>
+    <string name="key_back">Borrar uno</string>
+    <string name="key_parens">Paréntesis</string>
+    <string name="key_equals">Igual</string>
+</resources>

@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Calculator</string>
+    <string name="history">History</string>
+    <string name="history_clear">Clear all</string>
+    <string name="history_empty">Your calculations will appear here.</string>
+    <string name="error_zero">Cannot divide by zero</string>
+    <string name="error_parentheses">A parenthesis is not closed</string>
+    <string name="error_incomplete">A number is missing</string>
+    <string name="error_syntax">Invalid operation</string>
+    <string name="key_clear">Clear all</string>
+    <string name="key_back">Delete one</string>
+    <string name="key_parens">Parentheses</string>
+    <string name="key_equals">Equals</string>
+</resources>
