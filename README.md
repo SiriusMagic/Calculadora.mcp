@@ -10,7 +10,7 @@ calculadora y consultar su historial**, igual que Stone ofrece su música por MC
 - **Ventana flotante** sobre otras apps, **historial** compartido, **conversor de divisas** (tasas guardadas sin
   conexión) y **conversor de unidades**.
 - **Modo MCP:** tu IA calcula, convierte, lee el historial y (con permiso) escribe en tu pantalla: herramientas `calc_*`.
-- Internet solo para descargar las tasas y para el Modo MCP (apagado por defecto); las tasas de cambio de una dirección fija; sin anuncios ni copias en la nube.
+- Internet solo para descargar las tasas de cambio (de una dirección fija) y para el Modo MCP (apagado por defecto); sin anuncios ni copias en la nube.
 
 APK: [`android/Calculadora-0.3.0.apk`](android/Calculadora-0.3.0.apk) (`com.zirakusa.calculadora`, firmado como
 Stone y Gateway Hub).
