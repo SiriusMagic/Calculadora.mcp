@@ -9,4 +9,4 @@
   retira cuando esta app esté vinculada).
 
 ## Fase 3
-- Memoria (M+, M−, MR), funciones científicas y conversión de unidades/moneda (esta última necesitaría internet).
+- Memoria (M+, M−, MR), radianes además de grados, y más monedas a la vista.

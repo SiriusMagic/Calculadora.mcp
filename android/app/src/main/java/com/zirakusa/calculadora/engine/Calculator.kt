@@ -8,15 +8,18 @@ import java.math.RoundingMode
 class CalcError(val code: String, message: String) : Exception(message)
 
 /**
- * Exact decimal arithmetic for what the keypad can type: numbers, + − × ÷, %, parentheses and unary minus.
- * A small recursive-descent parser: nothing is ever executed as code, and the input size and depth are capped.
+ * Decimal arithmetic for what the keypad can type: numbers, + − × ÷, %, parentheses, unary minus and, in scientific
+ * mode, ^, !, √, sin cos tan (degrees), ln, log, π and e. A small recursive-descent parser: nothing is ever executed
+ * as code, and the input size and depth are capped. + − × ÷ and integer powers are exact; functions use doubles,
+ * rounded to 15 significant digits (so sin(180) is 0, not 1.2E-16).
  *
- * Grammar (× and ÷ bind tighter than + and −):
+ * Grammar (^ binds tighter than × ÷, which bind tighter than + −):
  *   expr   := term (('+' | '-') term)*
  *   term   := unary (('*' | '/') unary)*
- *   unary  := '-' unary | postfix
- *   postfix:= primary '%'*
- *   primary:= number | '(' expr ')'
+ *   unary  := '-' unary | power
+ *   power  := postfix ('^' unary)?
+ *   postfix:= primary ('%' | '!')*
+ *   primary:= number | 'π' | 'e' | '(' expr ')' | ('sin'|'cos'|'tan'|'ln'|'log'|'√') primary
  * «a + b%» and «a − b%» mean «a ± (a·b/100)», as on pocket calculators; elsewhere «b%» is b/100.
  */
 object Calculator {
@@ -34,11 +37,15 @@ object Calculator {
         return value.stripTrailingZeros().let { if (it.scale() < 0) it.setScale(0) else it }
     }
 
-    /** What the screen shows: plain digits (no 1E+3), at most 12 decimals. */
+    /** What the screen shows: plain digits with at most 12 decimals; very big numbers as 1.234567890123E+20. */
     fun format(value: BigDecimal): String {
+        if (value.abs() >= BIG) return value.round(MathContext(13, RoundingMode.HALF_EVEN)).stripTrailingZeros().toString()
         val rounded = value.setScale(12, RoundingMode.HALF_EVEN).stripTrailingZeros()
         return (if (rounded.scale() < 0) rounded.setScale(0) else rounded).toPlainString().let { if (it == "-0") "0" else it }
     }
+
+    private val BIG = BigDecimal("1E21")
+    private val FUNCTIONS = listOf("sin", "cos", "tan", "ln", "log", "√")
 
     /** Keypad symbols to plain ASCII; spaces and thousands separators are ignored. */
     fun normalize(expression: String): String = expression.replace('×', '*').replace('÷', '/').replace('−', '-')
@@ -81,14 +88,30 @@ object Calculator {
             if (depth > MAX_DEPTH) throw CalcError("TOO_DEEP", "Demasiados signos seguidos.")
             if (!done && peek() == '-') { pos++; return Operand(unary(depth + 1).value.negate(), false) }
             if (!done && peek() == '+') { pos++; return Operand(unary(depth + 1).value, false) }
+            val base = postfix(depth)
+            if (done || peek() != '^') return base
+            pos++
+            return Operand(power(base.value, unary(depth + 1).value), false)
+        }
+
+        private fun postfix(depth: Int): Operand {
             var value = primary(depth)
             var percents = 0
-            while (!done && peek() == '%') { pos++; percents++; value = value.divide(BigDecimal(100), CONTEXT) }
-            return Operand(value, percents == 1)
+            var other = false
+            while (!done && (peek() == '%' || peek() == '!')) {
+                if (text[pos++] == '%') { percents++; value = value.divide(BigDecimal(100), CONTEXT) } else { other = true; value = factorial(value) }
+            }
+            return Operand(value, percents == 1 && !other)
         }
 
         private fun primary(depth: Int): BigDecimal {
             if (done) throw CalcError("INCOMPLETE", "Falta un número al final.")
+            if (peek() == 'π') { pos++; return BigDecimal(Math.PI, CONTEXT) }
+            FUNCTIONS.firstOrNull { text.startsWith(it, pos) }?.let { name ->
+                pos += name.length
+                return function(name, primary(depth + 1))
+            }
+            if (peek() == 'e') { pos++; return BigDecimal(Math.E, CONTEXT) }
             if (peek() == '(') {
                 pos++
                 val value = expr(depth + 1)
@@ -105,5 +128,48 @@ object Calculator {
         }
 
         private fun peek() = text[pos]
+    }
+
+    /** Integer exponents up to 9 999 are exact; others (roots, fractions) go through doubles. */
+    private fun power(base: BigDecimal, exponent: BigDecimal): BigDecimal {
+        val whole = runCatching { exponent.intValueExact() }.getOrNull()
+        if (whole != null && kotlin.math.abs(whole) <= 9_999) {
+            if (whole < 0 && base.signum() == 0) throw CalcError("DIVISION_BY_ZERO", "No se puede dividir entre cero.")
+            val digits = base.abs().precision() - base.abs().scale()
+            if (digits.toLong() * kotlin.math.abs(whole) > 10_000) throw CalcError("TOO_BIG", "El resultado es demasiado grande.")
+            return if (whole >= 0) base.pow(whole, CONTEXT) else BigDecimal.ONE.divide(base.pow(-whole, CONTEXT), CONTEXT)
+        }
+        if (base.signum() < 0) throw CalcError("DOMAIN", "Una potencia no entera de un número negativo no es real.")
+        return fromDouble(Math.pow(base.toDouble(), exponent.toDouble()))
+    }
+
+    private fun factorial(n: BigDecimal): BigDecimal {
+        val k = runCatching { n.intValueExact() }.getOrNull()
+        if (k == null || k < 0) throw CalcError("DOMAIN", "El factorial es solo de enteros desde 0.")
+        if (k > 1_000) throw CalcError("TOO_BIG", "El resultado es demasiado grande.")
+        var result = java.math.BigInteger.ONE
+        for (i in 2..k) result = result.multiply(java.math.BigInteger.valueOf(i.toLong()))
+        return BigDecimal(result)
+    }
+
+    private fun function(name: String, x: BigDecimal): BigDecimal {
+        val d = x.toDouble()
+        val radians = Math.toRadians(d)
+        return fromDouble(when (name) {
+            "sin" -> Math.sin(radians)
+            "cos" -> Math.cos(radians)
+            "tan" -> if (Math.floorMod(Math.round(d * 1e9), Math.round(180e9)) == Math.round(90e9))
+                throw CalcError("DOMAIN", "La tangente de 90° no existe.") else Math.tan(radians)
+            "ln" -> if (d <= 0) throw CalcError("DOMAIN", "El logaritmo es solo de números positivos.") else Math.log(d)
+            "log" -> if (d <= 0) throw CalcError("DOMAIN", "El logaritmo es solo de números positivos.") else Math.log10(d)
+            else -> if (d < 0) throw CalcError("DOMAIN", "La raíz de un número negativo no es real.") else Math.sqrt(d)
+        })
+    }
+
+    /** 15 significant digits; dust below 1E-14 is zero (so sin(180) is 0). */
+    private fun fromDouble(d: Double): BigDecimal {
+        if (d.isNaN() || d.isInfinite()) throw CalcError("TOO_BIG", "El resultado es demasiado grande.")
+        if (kotlin.math.abs(d) < 1e-14) return BigDecimal.ZERO
+        return BigDecimal(d).round(MathContext(15, RoundingMode.HALF_EVEN))
     }
 }

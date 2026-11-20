@@ -1,5 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- No permissions yet: the calculator works offline. The MCP phase adds Internet for the relay only. -->
+    <!-- Exchange rates only (one fixed address, see data/RatesSource.kt); nothing about the user is sent. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Floating window over other apps, kept alive by a foreground service while it is open. -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -8,11 +14,16 @@
         android:icon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.NoActionBar">
-        <activity android:name=".MainActivity" android:exported="true" android:windowSoftInputMode="stateAlwaysHidden">
+        <activity android:name=".MainActivity" android:exported="true" android:windowSoftInputMode="stateAlwaysHidden"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:name=".floating.FloatingService" android:exported="false" android:foregroundServiceType="specialUse">
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Floating calculator window shown over other apps while the user keeps it open" />
+        </service>
     </application>
 </manifest>

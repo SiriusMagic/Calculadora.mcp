@@ -41,12 +41,27 @@ class CalculatorStateTest {
         assertEquals("", state.expression)
         state.type(Key.ZERO, Key.ZERO, Key.SEVEN, Key.PLUS, Key.TIMES)
         assertEquals("7×", state.expression)
-        state.type(Key.PARENS, Key.TWO, Key.PARENS, Key.DOT, Key.FIVE)
+        state.type(Key.PARENS, Key.TWO, Key.PARENS, Key.DOT, Key.FIVE)       // «( )» lives in the scientific rows
         assertEquals("7×(2)×0,5", state.expression)
         state.type(Key.DOT)                       // a number has one comma at most
         assertEquals("7×(2)×0,5", state.expression)
         state.type(Key.BACK, Key.BACK, Key.BACK, Key.BACK)
         assertEquals("7×(2)", state.expression)
+    }
+
+    @Test fun scientificKeysAddWhatTheyMean() {
+        val state = CalculatorState(Memory())
+        state.press(Key.SCIENTIFIC)
+        state.type(Key.TWO, Key.SIN, Key.THREE, Key.ZERO, Key.PARENS)
+        assertEquals("2×sin(30)", state.expression)
+        assertEquals("1", state.preview)
+        state.press(Key.BACK)                                   // ⌫ removes «)», then the 0…
+        state.type(Key.BACK, Key.BACK, Key.BACK)                // …the 3 and the whole «sin(»
+        assertEquals("2×", state.expression)
+        state.type(Key.PI, Key.SQUARE, Key.FACTORIAL)
+        assertEquals("2×π^2!", state.expression)
+        state.type(Key.CLEAR, Key.THREE, Key.POWER, Key.MINUS, Key.TWO)
+        assertEquals("3^−2", state.expression)
     }
 
     @Test fun anErrorIsShownUntilTheNextKeyAndNothingIsSaved() {
