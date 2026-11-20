@@ -69,6 +69,18 @@ class CalculatorState(private val store: HistoryStore, private val now: () -> Lo
         }
     }
 
+    /**
+     * An AI typed [text] through Modo MCP (calc_type): it appears on the screen in the calculator's own symbols, and
+     * with [equals] «=» is pressed (saved in the history like a user's). Returns the result, or null.
+     */
+    fun typeFromAi(text: String, equals: Boolean): String? {
+        expression = text.replace('*', '×').replace('/', '÷').replace('-', '−').replace('.', ',').filterNot { it.isWhitespace() }
+        error = null; justEvaluated = false
+        if (!equals) return null
+        equals()
+        return if (error == null) expression else null
+    }
+
     /** Reuses a past calculation (tap in the history). */
     fun reuse(entry: Entry) { expression = entry.expression; error = null; justEvaluated = false }
     fun clearHistory() { history = emptyList(); store.write(history) }

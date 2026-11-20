@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CurrencyExchange
 import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.Hub
 import androidx.compose.material.icons.outlined.PictureInPictureAlt
 import androidx.compose.material.icons.outlined.Straighten
 import androidx.compose.material3.Text
@@ -19,12 +20,14 @@ import androidx.compose.ui.unit.sp
 import com.zirakusa.calculadora.R
 
 /** Floating window · (history, currency, units) on top; the display; the keypad (with the scientific rows when on). */
-@Composable fun CalculatorScreen(state: CalculatorState, onFloat: () -> Unit, onCurrency: () -> Unit, onUnits: () -> Unit) {
+@Composable fun CalculatorScreen(state: CalculatorState, onFloat: () -> Unit, onCurrency: () -> Unit, onUnits: () -> Unit, onMcp: () -> Unit = {}) {
     var showHistory by remember { mutableStateOf(false) }
     val spoken = Key.entries.associateWith { describe(it) }
     Column(Modifier.fillMaxSize().background(CalcColors.Background).systemBarsPadding().padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Round(Icons.Outlined.PictureInPictureAlt, R.string.floating, onClick = onFloat)
+            Spacer(Modifier.width(8.dp))
+            Round(Icons.Outlined.Hub, R.string.mcp_title, onClick = onMcp)
             Spacer(Modifier.weight(1f))
             PillButtons(Triple(Icons.Outlined.History, R.string.history, showHistory to { showHistory = !showHistory; state.reloadHistory() }),
                 Triple(Icons.Outlined.CurrencyExchange, R.string.currency, false to onCurrency),

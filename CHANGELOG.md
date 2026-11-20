@@ -1,3 +1,15 @@
+# Calculadora 0.3.0
+
+- **Modo MCP** (botón de arriba, junto a la ventana flotante), como en Stone y Luma: Activar MCP, Crear token (LLM o
+  Hub, uso, solo lectura o lectura y escritura, validez), pausar, revocar y **Redireccionar a Hub** («Ir al Hub»).
+- Tu IA usa la calculadora: `calc_evaluate` (cualquier operación, también científica), `calc_add`, `calc_subtract`,
+  `calc_multiply`, `calc_divide`, `calc_percent`, `calc_power`, `calc_sqrt`, `calc_history`, `calc_convert_currency`,
+  `calc_currencies`, `calc_convert_units` y `calc_units`. Con un token de escritura también `calc_type` (escribe en tu
+  pantalla y puede pulsar «=») y `calc_history_clear`.
+- Todo pasa por el mismo motor exacto: los números se validan y nunca se ejecuta texto como código.
+- Llega por el mismo relay que Stone (`…/mcp?token=cal_…`); en el hub aparece como `calc_`.
+- 22 pruebas.
+
 # Calculadora 0.2.0
 
 - **Aspecto como la calculadora del teléfono:** fondo negro, teclas redondas y «=» naranja.

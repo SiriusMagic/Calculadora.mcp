@@ -64,6 +64,15 @@ class CalculatorStateTest {
         assertEquals("3^−2", state.expression)
     }
 
+    @Test fun anAiTypesOnTheScreenWithTheCalculatorsSymbols() {
+        val store = Memory()
+        val state = CalculatorState(store) { 9 }
+        assertEquals(null, state.typeFromAi("12.5*2-1", equals = false))
+        assertEquals("12,5×2−1", state.expression)
+        assertEquals("24", state.typeFromAi("12.5*2-1", equals = true))
+        assertEquals(listOf(Entry("12,5×2−1", "24", 9)), store.saved)
+    }
+
     @Test fun anErrorIsShownUntilTheNextKeyAndNothingIsSaved() {
         val store = Memory()
         val state = CalculatorState(store)

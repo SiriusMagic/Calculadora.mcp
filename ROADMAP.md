@@ -1,6 +1,6 @@
 # Hoja de ruta de la Calculadora
 
-## Fase 2 · Modo MCP (como Stone)
+## Fase 2 · Modo MCP (como Stone) — hecho en 0.3.0
 - Ajustes › **Modo MCP**: Activar MCP, Crear token (LLM o Hub, uso, validez, modo y herramientas), Analítica y
   **Redireccionar a Hub**.
 - Herramientas `calc_*`: `calc_evaluate` (devuelve resultado o código de error), `calc_history` (leer, buscar),

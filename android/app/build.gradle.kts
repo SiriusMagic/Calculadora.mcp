@@ -12,10 +12,13 @@ android {
         applicationId = "com.zirakusa.calculadora"
         minSdk = 26
         targetSdk = 36
-        versionCode = 2
-        versionName = "0.2.0"
+        versionCode = 3
+        versionName = "0.3.0"
+        // Modo MCP: the same public relay as Stone (one device id per app). Empty = no MCP over the internet.
+        val relayUrl = (project.findProperty("calcRelayUrl") as String?).orEmpty().trimEnd('/')
+        buildConfigField("String", "RELAY_URL", "\"$relayUrl\"")
     }
-    buildFeatures { compose = true }
+    buildFeatures { compose = true; buildConfig = true }
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -46,6 +49,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.10.0")
     // The floating window is drawn by a service (Compose outside an Activity).
     implementation("androidx.lifecycle:lifecycle-service:2.10.0")
+    // Modo MCP: WebSocket to the relay (same library and version as Stone and Luma).
+    implementation("com.squareup.okhttp3:okhttp:5.3.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.robolectric:robolectric:4.18")
