@@ -1,3 +1,9 @@
+# Calculadora 0.4.0
+
+- **Nada se pierde sin «=»:** si una operación tiene resultado (por ejemplo 8×8 = 64) y no pulsaste «=», se guarda
+  sola en el historial cuando la borrarías: al pulsar AC, al salir de la app, al cerrar la ventana flotante o al
+  reutilizar otra del historial. Aparece con la nota «Guardado sin «=»». Nunca se guarda dos veces seguidas.
+
 # Calculadora 0.3.0
 
 - **Modo MCP** (botón de arriba, junto a la ventana flotante), como en Stone y Luma: Activar MCP, Crear token (LLM o
@@ -30,8 +36,3 @@
   vivo, errores claros e historial de 100 cálculos solo en el teléfono.
 - Tema oscuro con el amarillo de Stone, español e inglés, sin permisos.
 - 9 pruebas (motor, teclado, historial y captura).
-
-## 0.4.0 (versionCode 4)
-- **Nada se pierde sin «=»:** si una operación tiene resultado (por ejemplo 8×8 = 64) y no pulsaste «=», se guarda
-  sola en el historial cuando la borrarías: al pulsar AC, al salir de la app, al cerrar la ventana flotante o al
-  reutilizar otra del historial. Aparece con la nota «Guardado sin «=»». Nunca se guarda dos veces seguidas.
