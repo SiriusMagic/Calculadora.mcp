@@ -48,7 +48,7 @@ class CalculatorState(private val store: HistoryStore, private val now: () -> Lo
         val wasResult = justEvaluated
         justEvaluated = false
         when {
-            key == Key.CLEAR -> expression = ""
+            key == Key.CLEAR -> { if (!wasResult) keepUnsaved(); expression = "" }
             key == Key.BACK -> expression = dropToken(expression)
             key == Key.EQUALS -> equals()
             key == Key.SCIENTIFIC -> scientific = !scientific
@@ -82,7 +82,19 @@ class CalculatorState(private val store: HistoryStore, private val now: () -> Lo
     }
 
     /** Reuses a past calculation (tap in the history). */
-    fun reuse(entry: Entry) { expression = entry.expression; error = null; justEvaluated = false }
+    fun reuse(entry: Entry) { if (!justEvaluated) keepUnsaved(); expression = entry.expression; error = null; justEvaluated = false }
+
+    /**
+     * A calculation with a live result that is about to be lost without «=» (AC, leaving the app, closing the floating
+     * window, reusing another one) goes to the history anyway, marked [Entry.auto]. Nothing is saved twice in a row.
+     */
+    fun keepUnsaved() {
+        if (justEvaluated) return
+        val result = runCatching { Calculator.format(Calculator.evaluate(expression)) }.getOrNull() ?: return
+        if (preview == null || history.firstOrNull()?.expression == expression) return
+        history = (listOf(Entry(expression, result, now(), auto = true)) + history).take(HistoryStore.MAX)
+        store.write(history)
+    }
     fun clearHistory() { history = emptyList(); store.write(history) }
     /** History written elsewhere (the floating window shares it). */
     fun reloadHistory() { history = store.read() }

@@ -26,6 +26,7 @@ import com.zirakusa.calculadora.R
                     Column(Modifier.fillMaxWidth().clickable { state.reuse(entry); onClose() }.padding(vertical = 12.dp, horizontal = 4.dp)) {
                         Text(entry.expression, color = CalcColors.Muted, fontSize = 17.sp)
                         Text(CalculatorState.shown(entry.result), color = CalcColors.Text, fontSize = 26.sp)
+                        if (entry.auto) Text(stringResource(R.string.history_auto), color = CalcColors.Muted, fontSize = 12.sp)
                     }
                     HorizontalDivider(color = CalcColors.Chip)
                 }

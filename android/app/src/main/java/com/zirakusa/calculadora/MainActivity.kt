@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
                 // calc_type (Modo MCP) writes on this screen while it is open.
                 DisposableEffect(state) { McpMode.screen = state; onDispose { McpMode.screen = null } }
                 var screen by rememberSaveable { mutableStateOf(Screen.CALCULATOR) }
-                LifecycleResumeEffect(Unit) { state.reloadHistory(); onPauseOrDispose { } } // the floating window adds to it too
+                LifecycleResumeEffect(Unit) { state.reloadHistory(); onPauseOrDispose { state.keepUnsaved() } } // the floating window adds to it too; leaving keeps an unsaved result
                 BackHandler(screen != Screen.CALCULATOR) { screen = Screen.CALCULATOR }
                 when (screen) {
                     Screen.CALCULATOR -> CalculatorScreen(state,

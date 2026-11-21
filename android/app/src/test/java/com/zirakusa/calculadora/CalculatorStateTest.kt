@@ -95,4 +95,19 @@ class CalculatorStateTest {
         state.clearHistory()
         assertEquals(emptyList<Entry>(), store.saved)
     }
+
+    @Test fun aResultWithoutEqualsIsNeverLost() {
+        val store = Memory()
+        val state = CalculatorState(store) { 7 }
+        state.type(Key.EIGHT, Key.TIMES, Key.EIGHT)          // 64 on screen, «=» never pressed
+        state.press(Key.CLEAR)
+        assertEquals(listOf(Entry("8×8", "64", 7, auto = true)), store.saved)
+        state.press(Key.CLEAR)                               // nothing to keep: no duplicate
+        state.type(Key.NINE); state.keepUnsaved()            // a lone number is not a calculation
+        state.type(Key.PLUS, Key.ONE); state.keepUnsaved(); state.keepUnsaved()
+        assertEquals(listOf("9+1", "8×8"), store.saved.map { it.expression })
+        state.type(Key.EQUALS); state.press(Key.CLEAR)       // after «=» it is already saved once
+        assertEquals(listOf("9+1", "9+1", "8×8"), store.saved.map { it.expression })
+        assertEquals(listOf(false, true, true), store.saved.map { it.auto })
+    }
 }

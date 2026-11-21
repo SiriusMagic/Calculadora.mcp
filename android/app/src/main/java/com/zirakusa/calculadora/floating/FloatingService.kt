@@ -57,7 +57,7 @@ class FloatingService : LifecycleService(), SavedStateRegistryOwner {
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT).apply {
             gravity = Gravity.TOP or Gravity.START; x = (40 * density).toInt(); y = (120 * density).toInt()
         }
-        val state = CalculatorState(PrefsHistory(this))
+        val state = CalculatorState(PrefsHistory(this)).also { floatingState = it }
         view = ComposeView(this).apply {
             setViewTreeLifecycleOwner(this@FloatingService)
             setViewTreeSavedStateRegistryOwner(this@FloatingService)
@@ -75,7 +75,11 @@ class FloatingService : LifecycleService(), SavedStateRegistryOwner {
         windows.addView(view, params)
     }
 
+    /** The window's calculator: closing it keeps a result that was not saved with «=». */
+    private var floatingState: CalculatorState? = null
+
     override fun onDestroy() {
+        floatingState?.keepUnsaved()
         view?.let { getSystemService(WindowManager::class.java).removeView(it) }
         view = null
         super.onDestroy()
