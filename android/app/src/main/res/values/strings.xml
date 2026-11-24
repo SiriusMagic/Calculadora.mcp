@@ -74,4 +74,11 @@
     <string name="mcp_revoke_text">La IA pierde el acceso al instante y su enlace deja de funcionar.</string>
     <string name="hub_link_permission">Vincular con Gateway Hub</string>
     <string name="history_auto">Guardado sin «=»</string>
+    <string name="icon_title">Icono de la app</string>
+    <string name="icon_original">Original</string>
+    <string name="icon_light">Claro</string>
+    <string name="icon_gold">Dorado</string>
+    <string name="icon_blue">Azul</string>
+    <string name="icon_green">Verde</string>
+    <string name="icon_hint">Cambia el icono de la pantalla de inicio. Algunos lanzadores tardan unos segundos en mostrarlo.</string>
 </resources>

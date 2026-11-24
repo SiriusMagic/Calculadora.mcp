@@ -36,6 +36,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppIcon.load(this)
         enableEdgeToEdge()
         val history = PrefsHistory(this)
         val rates = RatesSource(this)

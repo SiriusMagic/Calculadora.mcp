@@ -74,4 +74,11 @@
     <string name="mcp_revoke_text">The AI loses access at once and its link stops working.</string>
     <string name="hub_link_permission">Link with Gateway Hub</string>
     <string name="history_auto">Kept without «=»</string>
+    <string name="icon_title">App icon</string>
+    <string name="icon_original">Original</string>
+    <string name="icon_light">Light</string>
+    <string name="icon_gold">Gold</string>
+    <string name="icon_blue">Blue</string>
+    <string name="icon_green">Green</string>
+    <string name="icon_hint">Changes the home-screen icon. Some launchers take a few seconds to show it.</string>
 </resources>
