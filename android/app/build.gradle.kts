@@ -12,8 +12,8 @@ android {
         applicationId = "com.zirakusa.calculadora"
         minSdk = 26
         targetSdk = 36
-        versionCode = 4
-        versionName = "0.4.0"
+        versionCode = 5
+        versionName = "0.4.1"
         // Modo MCP: the same public relay as Stone (one device id per app). Empty = no MCP over the internet.
         val relayUrl = (project.findProperty("calcRelayUrl") as String?).orEmpty().trimEnd('/')
         buildConfigField("String", "RELAY_URL", "\"$relayUrl\"")
