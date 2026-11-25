@@ -1,3 +1,8 @@
+# Calculadora 0.5.0
+
+- **Iconos nuevos**: Cristal (el de fábrica), Píxel, Óleo, Dulce y Plano, en Ajustes › Icono de la app. Se quitan los
+  anteriores; si tenías uno elegido, pasa solo al nuevo que ocupa su lugar.
+
 # Calculadora 0.4.1
 
 - **Conectar todas** (Gateway Hub 0.0.21): con un toque en el Hub se activa aquí «Redireccionar a Hub» y la app queda

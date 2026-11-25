@@ -52,7 +52,7 @@ import com.zirakusa.calculadora.mcp.Token
             }
             if (McpMode.hubRedirect) Button(goToHub, colors = ButtonDefaults.buttonColors(CalcColors.Accent, Color.Black)) { Text(stringResource(R.string.mcp_go_to_hub)) }
         }
-        IconCard(CalcColors.Chip, CalcColors.Text, CalcColors.Muted, CalcColors.Accent, androidx.compose.ui.graphics.Color(0xFF111015))
+        IconCard(CalcColors.Chip, CalcColors.Text, CalcColors.Muted, CalcColors.Accent)
         if (McpMode.hubRedirect) return@Column
         Card(stringResource(R.string.mcp_tokens)) {
             if (creating) Editor({ creating = false }) { copy(McpMode.linkFor(it.secret)); creating = false }

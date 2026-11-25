@@ -90,7 +90,7 @@ class FloatingService : LifecycleService(), SavedStateRegistryOwner {
         manager.createNotificationChannel(NotificationChannel(CHANNEL, getString(R.string.floating), NotificationManager.IMPORTANCE_LOW))
         val close = PendingIntent.getService(this, 0, Intent(this, FloatingService::class.java).setAction(ACTION_CLOSE),
             PendingIntent.FLAG_IMMUTABLE)
-        return Notification.Builder(this, CHANNEL).setSmallIcon(R.drawable.ic_launcher_foreground)
+        return Notification.Builder(this, CHANNEL).setSmallIcon(R.drawable.ic_monochrome)
             .setContentTitle(getString(R.string.floating_on)).setContentText(getString(R.string.floating_tap_close))
             .setContentIntent(close).setOngoing(true).build()
     }
