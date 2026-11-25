@@ -1,6 +1,7 @@
 package com.zirakusa.calculadora.ui.convert
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import java.math.BigDecimal
@@ -13,7 +14,7 @@ import java.math.RoundingMode
 class ConverterState(codes: List<String>, private val decimals: Int,
     var convert: (BigDecimal, String, String) -> BigDecimal?) {
     var codes by mutableStateOf(codes); private set
-    var active by mutableStateOf(0); private set
+    var active by mutableIntStateOf(0); private set
     var input by mutableStateOf("1"); private set
 
     fun type(text: String) {

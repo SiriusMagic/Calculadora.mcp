@@ -5,7 +5,6 @@ import com.zirakusa.calculadora.engine.Rates
 import com.zirakusa.calculadora.mcp.Access
 import com.zirakusa.calculadora.mcp.CalcData
 import com.zirakusa.calculadora.mcp.HubLink
-import com.zirakusa.calculadora.mcp.Kind
 import com.zirakusa.calculadora.mcp.McpHandler
 import com.zirakusa.calculadora.mcp.McpMode
 import com.zirakusa.calculadora.mcp.Token
@@ -33,8 +32,8 @@ class McpTest {
         override suspend fun rates(fresh: Boolean) = Rates("USD", mapOf("EUR" to BigDecimal("0.9"), "MXN" to BigDecimal("18")), 1_763_596_800)
         override fun type(expression: String, equals: Boolean): String? { typed = expression to equals; return if (equals) "42" else null }
     }
-    private val reader = Token("r", "Claude", "cal_" + "r".repeat(40), Access.READ, Kind.HUB, "Cuentas")
-    private val writer = Token("w", "ChatGPT", "cal_" + "w".repeat(40), Access.WRITE)
+    private val reader = Token("cal_" + "r".repeat(40), Access.READ)
+    private val writer = Token("cal_" + "w".repeat(40))
     private val handler = McpHandler({ listOf(reader, writer) }, data, "0.3.0")
 
     private fun rpc(token: Token, method: String, params: JSONObject = JSONObject()) = runBlocking {
@@ -50,7 +49,7 @@ class McpTest {
         val read = rpc(reader, "tools/list").getJSONArray("tools").toString()
         assertTrue(read.contains("calc_multiply")); assertTrue(read.contains("calc_convert_currency")); assertFalse(read.contains("calc_type"))
         assertTrue(rpc(writer, "tools/list").getJSONArray("tools").toString().contains("calc_history_clear"))
-        assertEquals("hub", rpc(reader, "initialize").getJSONObject("_meta").getJSONObject(McpHandler.TOKEN_META).getString("kind"))
+        assertEquals("redirect", rpc(reader, "initialize").getJSONObject("_meta").getJSONObject(McpHandler.TOKEN_META).getString("kind"))
     }
 
     @Test fun operationsAreExactAndGoThroughTheEngine() {
@@ -92,33 +91,37 @@ class McpTest {
         assertTrue(data.history.isEmpty())
     }
 
-    @Test fun theHubGetsTheLinkOnlyWithTheSwitchOn() {
+    @Test fun arkaTurnsThePublicLinkOnAndOff() {
         McpMode.load(androidx.test.core.app.ApplicationProvider.getApplicationContext())
-        McpMode.redirect(false)
+        McpMode.turnRemote(false)
         assertEquals("REDIRECT_OFF", HubLink.answer(true).getString("error"))
-        // «Conectar todas» and Lucía's tools: only for the same developer, and tools only with «Redireccionar a Hub» on.
-        assertEquals("NOT_SAME_DEVELOPER", HubLink.connect(false).getString("error"))
-        assertEquals("NOT_SAME_DEVELOPER", HubLink.tool(false, "{}").getString("error"))
-        assertEquals("REDIRECT_OFF", HubLink.tool(true, "{}").getString("error"))
-        McpMode.redirect(true)
-        assertTrue(HubLink.answer(true).getString("link")!!.contains("/mcp?token=cal_"))
-        assertEquals("NOT_SAME_DEVELOPER", HubLink.answer(false).getString("error"))
-        McpMode.redirect(false)
+        // Only the same developer (Arka) may connect, disconnect, read the status or run a tool.
+        listOf(HubLink.connect(false), HubLink.disconnect(false), HubLink.status(false), HubLink.tool(false, "{}"))
+            .forEach { assertEquals("NOT_SAME_DEVELOPER", it.getString("error")) }
+        assertTrue(HubLink.connect(true).getString("link")!!.contains("/mcp?token=cal_"))
+        assertTrue(HubLink.status(true).getBoolean("remote"))
+        assertFalse(HubLink.disconnect(true).getBoolean("remote"))
+        assertEquals("REDIRECT_OFF", HubLink.answer(true).getString("error"))
     }
 
-    /** Lucía runs a tool on the phone through the same handler, only while «Redireccionar a Hub» is on. */
+    @Test fun theOldHubTokenIsKept() {
+        val old = """[{"id":"a","secret":"cal_${"l".repeat(40)}","kind":"llm"},{"id":"b","secret":"cal_${"h".repeat(40)}","kind":"redirect"}]"""
+        assertEquals("cal_" + "h".repeat(40), com.zirakusa.calculadora.mcp.Legacy.redirectSecret(old))
+        assertEquals(null, com.zirakusa.calculadora.mcp.Legacy.redirectSecret("[]"))
+        assertEquals(null, com.zirakusa.calculadora.mcp.Legacy.redirectSecret(""))
+    }
+
+    /** Lucía runs a tool on the phone through the same handler, with or without the public link. */
     @Test fun luciaRunsToolsOnThePhone() {
-        val relay = com.zirakusa.calculadora.mcp.McpMode.relayUrl
-        com.zirakusa.calculadora.mcp.McpMode.relayUrl = ""                                             // no relay in tests
-        com.zirakusa.calculadora.mcp.McpMode.load(org.robolectric.RuntimeEnvironment.getApplication())
-        com.zirakusa.calculadora.mcp.McpMode.redirect(false)
-        assertEquals(null, com.zirakusa.calculadora.mcp.McpMode.local("{}"))
-        HubLink.connect(true); assertTrue(com.zirakusa.calculadora.mcp.McpMode.hubRedirect)                // «Conectar todas»
-        val list = JSONObject(com.zirakusa.calculadora.mcp.McpMode.local("""{"jsonrpc":"2.0","id":1,"method":"tools/list"}""")!!)
+        val relay = McpMode.relayUrl
+        McpMode.relayUrl = ""                                             // no relay in tests
+        McpMode.load(org.robolectric.RuntimeEnvironment.getApplication())
+        McpMode.turnRemote(false)
+        val list = JSONObject(McpMode.local("""{"jsonrpc":"2.0","id":1,"method":"tools/list"}""")!!)
         assertTrue(list.getJSONObject("result").getJSONArray("tools").length() > 0)
         val viaProvider = JSONObject(HubLink.tool(true, """{"jsonrpc":"2.0","id":2,"method":"tools/list"}""").getString("response"))
         assertEquals(2, viaProvider.getInt("id"))
-        com.zirakusa.calculadora.mcp.McpMode.redirect(false)
-        com.zirakusa.calculadora.mcp.McpMode.relayUrl = relay                                          // as the other tests expect
+        assertEquals("BAD_REQUEST", HubLink.tool(true, "").getString("error"))
+        McpMode.relayUrl = relay                                          // as the other tests expect
     }
 }

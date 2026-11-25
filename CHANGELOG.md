@@ -1,3 +1,12 @@
+# Calculadora 0.6.0
+
+- **El Modo MCP lo controla Arka**: se quita la pantalla «Modo MCP» (Activar MCP, Redireccionar a Hub, Crear token y la
+  lista de tokens). Activarlo, permitirlo en local y crear tokens se hace desde **Arka › MCP**. Si ya estaba conectada al
+  hub, sigue conectada con el mismo enlace; los tokens LLM y Hub creados aquí dejan de funcionar (créalos en Arka).
+- El botón de arriba es ahora **Ajustes** (el icono de la app).
+- Lucía usa las herramientas en el teléfono aunque el enlace público esté apagado; lo decide «Permitir MCP local» en Arka.
+- App más ligera: 1,73 MB → 1,53 MB.
+
 # Calculadora 0.5.0
 
 - **Iconos nuevos**: Cristal (el de fábrica), Píxel, Óleo, Dulce y Plano, en Ajustes › Icono de la app. Se quitan los
