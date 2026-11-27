@@ -6,6 +6,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.activity.compose.LocalActivity
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,8 +17,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zirakusa.calculadora.IconCard
 import com.zirakusa.calculadora.R
+import com.zirakusa.calculadora.mcp.showMcpOptions
 
-/** Ajustes: the app's icon. The Modo MCP is turned on from Arka, so it only says so. */
+
 @Composable fun SettingsScreen(onBack: () -> Unit) {
     Column(Modifier.fillMaxSize().background(CalcColors.Background).systemBarsPadding().padding(16.dp).verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -25,6 +28,9 @@ import com.zirakusa.calculadora.R
             Text(stringResource(R.string.settings), Modifier.padding(start = 16.dp), fontSize = 22.sp)
         }
         IconCard(CalcColors.Chip, CalcColors.Text, CalcColors.Muted, CalcColors.Accent)
-        Text(stringResource(R.string.mcp_by_arka), color = CalcColors.Muted, fontSize = 13.sp)
+        val activity = LocalActivity.current
+        OutlinedButton({ activity?.let(::showMcpOptions) }, enabled = activity != null) {
+            Text(stringResource(R.string.mcp_option_title))
+        }
     }
 }

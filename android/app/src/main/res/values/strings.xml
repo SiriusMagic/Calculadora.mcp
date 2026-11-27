@@ -39,7 +39,6 @@
     <string name="unit_data">Datos</string>
     <string name="unit_time">Tiempo</string>
     <string name="settings">Ajustes</string>
-    <string name="mcp_by_arka">El Modo MCP (agentes de IA) se controla desde Arka: activarlo, permitirlo en local y crear tokens.</string>
     <string name="hub_link_permission">Vincular con Gateway Hub</string>
     <string name="history_auto">Guardado sin «=»</string>
     <string name="icon_title">Icono de la app</string>

@@ -119,9 +119,13 @@ class McpTest {
         McpMode.turnRemote(false)
         val list = JSONObject(McpMode.local("""{"jsonrpc":"2.0","id":1,"method":"tools/list"}""")!!)
         assertTrue(list.getJSONObject("result").getJSONArray("tools").length() > 0)
+        McpMode.allowLocal(false)
+        assertEquals("LOCAL_DISABLED", HubLink.tool(true, "{}").getString("error"))
+        McpMode.allowLocal(true)
         val viaProvider = JSONObject(HubLink.tool(true, """{"jsonrpc":"2.0","id":2,"method":"tools/list"}""").getString("response"))
         assertEquals(2, viaProvider.getInt("id"))
         assertEquals("BAD_REQUEST", HubLink.tool(true, "").getString("error"))
+        McpMode.allowLocal(false)
         McpMode.relayUrl = relay                                          // as the other tests expect
     }
 }

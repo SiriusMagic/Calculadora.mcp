@@ -49,7 +49,7 @@ class McpHandler(private val tokens: () -> List<Token>, private val data: CalcDa
                     "Errors carry a code (structuredContent.error.code). " +
                     if (token.access == Access.READ) "This token is read-only." else "calc_type writes on the calculator's screen.")
                 .put("_meta", JSONObject().put(TOKEN_META, JSONObject().put("name", "Arka").put("kind", "redirect").put("mode", token.access.key)))
-            "ping" -> JSONObject()
+            "ping" -> McpProbeReceipt.accept(id)
             "tools/list" -> JSONObject().put("tools", JSONArray(CalcTools.available(token.access).map {
                 JSONObject().put("name", it.name).put("description", it.description).put("inputSchema", it.schema)
                     .put("annotations", JSONObject().put("readOnlyHint", !it.write).put("destructiveHint", false))
